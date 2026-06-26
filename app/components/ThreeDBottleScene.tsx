@@ -48,9 +48,11 @@ function Bottle({ scrollRef }: ScrollProps) {
   // useThree() is read here for the viewport only — NOT for the camera (the
   // camera is mutated inside useFrame to avoid R3F immutability lint errors).
   const { viewport } = useThree();
-  // Scale the bottle plane to a sensible fraction of the visible viewport while
-  // preserving the source aspect ratio (576 x 1024).
-  const aspect = 576 / 1024;
+  // Derive the plane aspect ratio from the actual texture so the label artwork
+  // is never stretched or squashed — whatever PNG is dropped in (tall crop or
+  // square mockup), the geometry matches it 1:1 and the text stays crisp.
+  const img = texture.image as { width?: number; height?: number } | undefined;
+  const aspect = img?.width && img?.height ? img.width / img.height : 576 / 1024;
   const height = Math.min(2.6, viewport.height * 0.82);
   const width = height * aspect;
 
@@ -331,7 +333,9 @@ export default function ThreeDBottleScene() {
           trigger: ".td-section",
           start: "top top",
           end: "+=200%",
-          scrub: 0.5,
+          // scrub: true ties progress directly to the scrollbar position (no
+          // inertia/lag) so the bottle + camera track the user's scroll 1:1.
+          scrub: true,
           pin: true,
         },
       });
