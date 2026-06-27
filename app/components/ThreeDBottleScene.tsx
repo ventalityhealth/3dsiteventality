@@ -74,13 +74,12 @@ function Bottle({ scrollRef }: ScrollProps) {
   return (
     <mesh ref={meshRef} position={[0, 0, 0]}>
       <planeGeometry args={[width, height]} />
-      <meshStandardMaterial
-        map={texture}
-        transparent
-        roughness={0.65}
-        metalness={0.1}
-        side={THREE.DoubleSide}
-      />
+      {/*
+        The bottle is a real, already-lit product render, so it uses an unlit
+        basic material to preserve the photo's exact color/brightness (true
+        1:1 fidelity) and let the bright white cap drive the bloom pass.
+      */}
+      <meshBasicMaterial map={texture} transparent side={THREE.DoubleSide} />
     </mesh>
   );
 }
